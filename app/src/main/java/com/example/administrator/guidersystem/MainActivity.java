@@ -49,17 +49,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onClick(View v) {
                     String num=input_num.getText().toString();
-                    manager.queryDB(num);
-                    if(!manager.getNumber().equals(num)){
-                        Toast.makeText(MainActivity.this, "不存在此编号", Toast.LENGTH_SHORT).show();
-                    }else {
-                        Intent intent = new Intent(MainActivity.this, SearchResultActivity.class);
-                        Bundle bundle=new Bundle();
-                        bundle.putString("name",manager.getName());
-                        bundle.putString("introduction",manager.getIntroduction());
-                        bundle.putString("music_num",manager.getMusic_num());
-                        intent.putExtra("data",bundle);
-                        startActivity(intent);
+                    try {
+                        manager.setNumber("a");//保证number不为空
+                        manager.queryDB(num);
+                        if (!manager.getNumber().equals(num)) {
+                            Toast.makeText(MainActivity.this, "不存在此编号", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Intent intent = new Intent(MainActivity.this, SearchResultActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putString("name", manager.getName());
+                            bundle.putString("introduction", manager.getIntroduction());
+                            bundle.putString("music_num", manager.getMusic_num());
+                            intent.putExtra("data", bundle);
+                            startActivity(intent);
+                        }
+                    }
+                    catch (Exception e){
+                        Log.d("MainActivity",Log.getStackTraceString(e));
                     }
                 }
             });
