@@ -14,8 +14,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  -->
+<!-- Base application theme. -->
 <resources>
-
   <style name="ResultButton" parent="@android:style/Widget.Holo.Button.Borderless.Small">
     <item name="android:layout_width">0dip</item>
     <item name="android:layout_height">wrap_content</item>

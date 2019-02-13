@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -15,7 +16,7 @@ import android.widget.TextView;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class SearchResultActivity extends AppCompatActivity implements View.OnClickListener,SeekBar.OnSeekBarChangeListener{
+public class SearchResultActivity extends BaseActivity implements View.OnClickListener,SeekBar.OnSeekBarChangeListener{
     private MediaPlayer mediaPlayer;
     private String music_num;
     private static SeekBar seekBar;
@@ -79,7 +80,7 @@ public class SearchResultActivity extends AppCompatActivity implements View.OnCl
             int id=Integer.parseInt(music_num);
             mediaPlayer=MediaPlayer.create(this,id);
             bl=true;
-            play_pause.setText("play");
+            play_pause.setBackgroundResource(R.drawable.play_circle);
         }
         catch (Exception e){
             Log.d("MainActivity",Log.getStackTraceString(e));
@@ -122,14 +123,14 @@ public class SearchResultActivity extends AppCompatActivity implements View.OnCl
                             }
                         }.start();
                         bl=false;
-                        play_pause.setText("pause");
+                        play_pause.setBackgroundResource(R.drawable.time_out);
                     }
                 }
                 else if (bl==false) {
                     if (mediaPlayer.isPlaying()) {
                         mediaPlayer.pause();
                         bl=true;
-                        play_pause.setText("play");
+                        play_pause.setBackgroundResource(R.drawable.play_circle);
                     }
                 }
                 break;

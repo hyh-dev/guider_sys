@@ -24,8 +24,10 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -40,10 +42,8 @@ import java.util.List;
  */
 public final class ViewfinderView extends View {
 
-  private static final int[] SCANNER_ALPHA = {0, 64, 128, 192, 255, 192, 128, 64};
-  private static final long ANIMATION_DELAY = 80L;
+  private static final long ANIMATION_DELAY = 20L;
   private static final int CURRENT_POINT_OPACITY = 0xA0;
-  private static final int MAX_RESULT_POINTS = 20;
   private static final int POINT_SIZE = 6;
 
   private CameraManager cameraManager;
@@ -51,12 +51,11 @@ public final class ViewfinderView extends View {
   private Bitmap resultBitmap;
   private final int maskColor;
   private final int resultColor;
-  private final int laserColor;
-  private final int resultPointColor;
-  private int scannerAlpha;
-  private List<ResultPoint> possibleResultPoints;
-  private List<ResultPoint> lastPossibleResultPoints;
-
+  public int laserLinePosition=0;
+  public LinearGradient linearGradient;
+  public float[]position=new float[]{0f,0.5f,1f};
+  //public int[]colors=new int[]{0x0047ac31,0xffff0fff,0x00ffff0f};
+  public int[]colors=new int[]{0xFF7FFF00,0xFF00FF00,0xFF93DB70};
   // This constructor is used when the class is built from an XML resource.
   public ViewfinderView(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -66,11 +65,6 @@ public final class ViewfinderView extends View {
     Resources resources = getResources();
     maskColor = resources.getColor(R.color.viewfinder_mask);
     resultColor = resources.getColor(R.color.result_view);
-    laserColor = resources.getColor(R.color.viewfinder_laser);
-    resultPointColor = resources.getColor(R.color.possible_result_points);
-    scannerAlpha = 0;
-    possibleResultPoints = new ArrayList<>(5);
-    lastPossibleResultPoints = null;
   }
 
   public void setCameraManager(CameraManager cameraManager) {
@@ -90,6 +84,17 @@ public final class ViewfinderView extends View {
     }
     int width = canvas.getWidth();
     int height = canvas.getHeight();
+      //在扫描框上画四个角
+      paint.setColor(0xFF47ac31);
+      canvas.drawRect(frame.left, frame.top, frame.left+70, frame.top+10,paint);
+      canvas.drawRect(frame.left, frame.top, frame.left+10, frame.top+70,paint);
+      canvas.drawRect(frame.right-70, frame.top, frame.right, frame.top+10,paint);
+      canvas.drawRect(frame.right-10, frame.top, frame.right, frame.top+70,paint);
+      canvas.drawRect(frame.left, frame.bottom-10, frame.left+70, frame.bottom,paint);
+      canvas.drawRect(frame.left, frame.bottom-70, frame.left+10, frame.bottom,paint);
+      canvas.drawRect(frame.right-70, frame.bottom-10, frame.right, frame.bottom,paint);
+      canvas.drawRect(frame.right-10, frame.bottom-70, frame.right, frame.bottom,paint);
+
 
     // Draw the exterior (i.e. outside the framing rect) darkened
     paint.setColor(resultBitmap != null ? resultColor : maskColor);
@@ -97,7 +102,6 @@ public final class ViewfinderView extends View {
     canvas.drawRect(0, frame.top, frame.left, frame.bottom + 1, paint);
     canvas.drawRect(frame.right + 1, frame.top, width, frame.bottom + 1, paint);
     canvas.drawRect(0, frame.bottom + 1, width, height, paint);
-
     if (resultBitmap != null) {
       // Draw the opaque result bitmap over the scanning rectangle
       paint.setAlpha(CURRENT_POINT_OPACITY);
@@ -105,46 +109,22 @@ public final class ViewfinderView extends View {
     } else {
 
       // Draw a red "laser scanner" line through the middle to show decoding is active
-      paint.setColor(laserColor);
-      paint.setAlpha(SCANNER_ALPHA[scannerAlpha]);
-      scannerAlpha = (scannerAlpha + 1) % SCANNER_ALPHA.length;
       int middle = frame.height() / 2 + frame.top;
-      canvas.drawRect(frame.left + 2, middle - 1, frame.right - 1, middle + 2, paint);
-      
+      laserLinePosition=laserLinePosition+5;
+      if(laserLinePosition> frame.height()) {
+
+        laserLinePosition=0;
+
+      }
+      linearGradient=new LinearGradient(frame.left+1, frame.top+laserLinePosition, frame.right-1,
+              frame.top+10+laserLinePosition,colors,position, Shader.TileMode.CLAMP);
+      paint.setShader(linearGradient);
+
+      canvas.drawRect(frame.left+1, frame.top+laserLinePosition, frame.right-1, frame.top+10+laserLinePosition,paint);
+      paint.setShader(null);
+
       float scaleX = frame.width() / (float) previewFrame.width();
       float scaleY = frame.height() / (float) previewFrame.height();
-
-      List<ResultPoint> currentPossible = possibleResultPoints;
-      List<ResultPoint> currentLast = lastPossibleResultPoints;
-      int frameLeft = frame.left;
-      int frameTop = frame.top;
-      if (currentPossible.isEmpty()) {
-        lastPossibleResultPoints = null;
-      } else {
-        possibleResultPoints = new ArrayList<>(5);
-        lastPossibleResultPoints = currentPossible;
-        paint.setAlpha(CURRENT_POINT_OPACITY);
-        paint.setColor(resultPointColor);
-        synchronized (currentPossible) {
-          for (ResultPoint point : currentPossible) {
-            canvas.drawCircle(frameLeft + (int) (point.getX() * scaleX),
-                              frameTop + (int) (point.getY() * scaleY),
-                              POINT_SIZE, paint);
-          }
-        }
-      }
-      if (currentLast != null) {
-        paint.setAlpha(CURRENT_POINT_OPACITY / 2);
-        paint.setColor(resultPointColor);
-        synchronized (currentLast) {
-          float radius = POINT_SIZE / 2.0f;
-          for (ResultPoint point : currentLast) {
-            canvas.drawCircle(frameLeft + (int) (point.getX() * scaleX),
-                              frameTop + (int) (point.getY() * scaleY),
-                              radius, paint);
-          }
-        }
-      }
 
       // Request another update at the animation interval, but only repaint the laser line,
       // not the entire viewfinder mask.
@@ -164,27 +144,4 @@ public final class ViewfinderView extends View {
     }
     invalidate();
   }
-
-  /**
-   * Draw a bitmap with the result points highlighted instead of the live scanning display.
-   *
-   * @param barcode An image of the decoded barcode.
-   */
-  public void drawResultBitmap(Bitmap barcode) {
-    resultBitmap = barcode;
-    invalidate();
-  }
-
-  public void addPossibleResultPoint(ResultPoint point) {
-    List<ResultPoint> points = possibleResultPoints;
-    synchronized (points) {
-      points.add(point);
-      int size = points.size();
-      if (size > MAX_RESULT_POINTS) {
-        // trim it
-        points.subList(0, size - MAX_RESULT_POINTS / 2).clear();
-      }
-    }
-  }
-
 }

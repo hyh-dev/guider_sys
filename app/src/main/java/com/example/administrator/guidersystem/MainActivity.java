@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -22,8 +23,9 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.zxing.client.android.CaptureActivity;
+import com.google.zxing.client.android.Intents;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Button scan;
     private Button searchByNumber;
     private DatabaseManager manager;
@@ -49,24 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onClick(View v) {
                     String num=input_num.getText().toString();
-                    try {
-                        manager.setNumber("a");//保证number不为空
-                        manager.queryDB(num);
-                        if (!manager.getNumber().equals(num)) {
-                            Toast.makeText(MainActivity.this, "不存在此编号", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Intent intent = new Intent(MainActivity.this, SearchResultActivity.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putString("name", manager.getName());
-                            bundle.putString("introduction", manager.getIntroduction());
-                            bundle.putString("music_num", manager.getMusic_num());
-                            intent.putExtra("data", bundle);
-                            startActivity(intent);
-                        }
-                    }
-                    catch (Exception e){
-                        Log.d("MainActivity",Log.getStackTraceString(e));
-                    }
+                    query(num);
                 }
             });
             cancel.setOnClickListener(new View.OnClickListener() {
@@ -120,13 +105,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
             case R.id.scan_QRcode:
                 Intent intent=new Intent(MainActivity.this,CaptureActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
                 break;
             case R.id.searchByNumber:
                 Dialog dialog=new Dialog(MainActivity.this);
                 v= View.inflate(this, R.layout.alert_dialog, null);
                 dialog.setView(v);
                 dialog.show();
+                break;
+                default:
+                    break;
+        }
+    }
+    //通过编号查询结果
+    public void query(String num){
+        try {
+            manager.setNumber("a");//保证number不为空
+            manager.queryDB(num);
+            if (!manager.getNumber().equals(num)) {
+                Toast.makeText(MainActivity.this, "不存在此编号", Toast.LENGTH_SHORT).show();
+            } else {
+                Intent intent = new Intent(MainActivity.this, SearchResultActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("name", manager.getName());
+                bundle.putString("introduction", manager.getIntroduction());
+                bundle.putString("music_num", manager.getMusic_num());
+                intent.putExtra("data", bundle);
+                startActivity(intent);
+            }
+        } catch (Exception e) {
+            Log.d("MainActivity", Log.getStackTraceString(e));
+        }
+    }
+
+    //二维码扫描结果
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,Intent data) {
+        switch (requestCode){
+            case 1:
+                if (resultCode==RESULT_OK) {
+                    String returnData = data.getStringExtra("data");
+                    query(returnData);
+                }
                 break;
                 default:
                     break;

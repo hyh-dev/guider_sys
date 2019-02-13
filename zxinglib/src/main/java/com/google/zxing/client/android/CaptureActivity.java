@@ -23,14 +23,10 @@ import com.google.zxing.ResultMetadataType;
 import com.google.zxing.ResultPoint;
 import com.google.zxing.client.android.camera.CameraManager;
 import com.google.zxing.client.android.clipboard.ClipboardInterface;
-import com.google.zxing.client.android.history.HistoryActivity;
-import com.google.zxing.client.android.history.HistoryItem;
-import com.google.zxing.client.android.history.HistoryManager;
 import com.google.zxing.client.android.result.ResultButtonListener;
 import com.google.zxing.client.android.result.ResultHandler;
 import com.google.zxing.client.android.result.ResultHandlerFactory;
 import com.google.zxing.client.android.result.supplement.SupplementalInfoRetriever;
-import com.google.zxing.client.android.share.ShareActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -82,7 +78,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   private static final String TAG = CaptureActivity.class.getSimpleName();
 
-  private static final long DEFAULT_INTENT_RESULT_DURATION_MS = 1500L;
+  private static final long DEFAULT_INTENT_RESULT_DURATION_MS = 0L;
   private static final long BULK_MODE_SCAN_DELAY_MS = 1000L;
 
   private static final String[] ZXING_URLS = { "http://zxing.appspot.com/scan", "zxing://scan/" };
@@ -110,7 +106,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private Collection<BarcodeFormat> decodeFormats;
   private Map<DecodeHintType,?> decodeHints;
   private String characterSet;
-  private HistoryManager historyManager;
   private InactivityTimer inactivityTimer;
   private BeepManager beepManager;
   private AmbientLightManager ambientLightManager;
@@ -148,9 +143,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     super.onResume();
     
     // historyManager must be initialized here to update the history preference
-    historyManager = new HistoryManager(this);
-    historyManager.trimHistory();
-
     // CameraManager must be initialized here, not in onCreate(). This is necessary because we don't
     // want to open the camera driver and measure the screen size if we're going to show the help on
     // first launch. That led to bugs where the scanning rectangle was the wrong size and partially
@@ -352,46 +344,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   }
 
   @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    MenuInflater menuInflater = getMenuInflater();
-    menuInflater.inflate(R.menu.capture, menu);
-    return super.onCreateOptionsMenu(menu);
-  }
-
-  /*@Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    Intent intent = new Intent(Intent.ACTION_VIEW);
-    intent.addFlags(Intents.FLAG_NEW_DOC);
-    switch (item.getItemId()) {
-      case R.id.menu_share:
-        intent.setClassName(this, ShareActivity.class.getName());
-        startActivity(intent);
-        break;
-      case R.id.menu_history:
-        intent.setClassName(this, HistoryActivity.class.getName());
-        startActivityForResult(intent, HISTORY_REQUEST_CODE);
-        break;
-      case R.id.menu_settings:
-        intent.setClassName(this, PreferencesActivity.class.getName());
-        startActivity(intent);
-        break;
-      case R.id.menu_help:
-        intent.setClassName(this, HelpActivity.class.getName());
-        startActivity(intent);
-        break;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
-    return true;
-  }*/
-
-  @Override
   public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-    if (resultCode == RESULT_OK && requestCode == HISTORY_REQUEST_CODE && historyManager != null) {
+    if (resultCode == RESULT_OK && requestCode == HISTORY_REQUEST_CODE ) {
       int itemNumber = intent.getIntExtra(Intents.History.ITEM_NUMBER, -1);
       if (itemNumber >= 0) {
-        HistoryItem historyItem = historyManager.buildHistoryItem(itemNumber);
-        decodeOrStoreSavedBitmap(null, historyItem.getResult());
+        decodeOrStoreSavedBitmap(null, null);
       }
     }
   }
@@ -443,11 +400,15 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   public void handleDecode(Result rawResult, Bitmap barcode, float scaleFactor) {
     inactivityTimer.onActivity();
     lastResult = rawResult;
+    //返回扫描结果
+    Intent intent=new Intent();
+    intent.putExtra("data",rawResult.toString());
+    setResult(RESULT_OK,intent);
+    finish();
     ResultHandler resultHandler = ResultHandlerFactory.makeResultHandler(this, rawResult);
 
     boolean fromLiveScan = barcode != null;
     if (fromLiveScan) {
-      historyManager.addHistoryItem(rawResult, resultHandler);
       // Then not from history, so beep/vibrate and we have an image to draw on
       beepManager.playBeepSoundAndVibrate();
       drawResultPoints(barcode, scaleFactor, rawResult);
@@ -536,7 +497,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       return;
     }
 
-    statusView.setVisibility(View.GONE);
+   /* statusView.setVisibility(View.GONE);
     viewfinderView.setVisibility(View.GONE);
     resultView.setVisibility(View.VISIBLE);
 
@@ -546,7 +507,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
           R.drawable.launcher_icon));
     } else {
       barcodeImageView.setImageBitmap(barcode);
-    }
+    }*/
 
     TextView formatTextView = (TextView) findViewById(R.id.format_text_view);
     formatTextView.setText(rawResult.getBarcodeFormat().toString());
@@ -592,7 +553,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         PreferencesActivity.KEY_SUPPLEMENTAL, true)) {
       SupplementalInfoRetriever.maybeInvokeRetrieval(supplementTextView,
                                                      resultHandler.getResult(),
-                                                     historyManager,
                                                      this);
     }
 
@@ -614,10 +574,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   // Briefly show the contents of the barcode, then handle the result outside Barcode Scanner.
   private void handleDecodeExternally(Result rawResult, ResultHandler resultHandler, Bitmap barcode) {
-
+   /*
     if (barcode != null) {
-      viewfinderView.drawResultBitmap(barcode);
+      viewfinderView.drawResultBitmap(barcode);//扫描结果图片
     }
+    */
 
     long resultDurationMS;
     if (getIntent() == null) {
@@ -740,7 +701,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   private void displayFrameworkBugMessageAndExit() {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder.setTitle(getString(R.string.app_name));
     builder.setMessage(getString(R.string.msg_camera_framework_bug));
     builder.setPositiveButton(R.string.button_ok, new FinishListener(this));
     builder.setOnCancelListener(new FinishListener(this));

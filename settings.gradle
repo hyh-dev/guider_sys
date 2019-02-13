@@ -1,1 +1,2 @@
 include ':app', 'zxinglib'
+include ':onsdk_all'

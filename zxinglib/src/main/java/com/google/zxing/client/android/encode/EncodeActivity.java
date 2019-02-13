@@ -76,43 +76,6 @@ public final class EncodeActivity extends Activity {
     }
   }
 
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    MenuInflater menuInflater = getMenuInflater();
-    menuInflater.inflate(R.menu.encode, menu);
-    boolean useVcard = qrCodeEncoder != null && qrCodeEncoder.isUseVCard();
-    int encodeNameResource = useVcard ? R.string.menu_encode_mecard : R.string.menu_encode_vcard;
-    MenuItem encodeItem = menu.findItem(R.id.menu_encode);
-    encodeItem.setTitle(encodeNameResource);
-    Intent intent = getIntent();
-    if (intent != null) {
-      String type = intent.getStringExtra(Intents.Encode.TYPE);
-      encodeItem.setVisible(Contents.Type.CONTACT.equals(type));
-    }
-    return super.onCreateOptionsMenu(menu);
-  }
-
- /* @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case R.id.menu_share:
-        share();
-        return true;
-      case R.id.menu_encode:
-        Intent intent = getIntent();
-        if (intent == null) {
-          return false;
-        }
-        intent.putExtra(USE_VCARD_KEY, !qrCodeEncoder.isUseVCard());
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-        finish();
-        return true;
-      default:
-        return false;
-    }
-  }*/
-  
   private void share() {
     QRCodeEncoder encoder = qrCodeEncoder;
     if (encoder == null) { // Odd
@@ -158,7 +121,6 @@ public final class EncodeActivity extends Activity {
     }
 
     Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
-    intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " - " + encoder.getTitle());
     intent.putExtra(Intent.EXTRA_TEXT, contents);
     intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + barcodeFile.getAbsolutePath()));
     intent.setType("image/png");
