@@ -9,6 +9,11 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.example.administrator.guidersystem.discoveryPage.DiscoveryActivity;
+import com.example.administrator.guidersystem.homePage.HomeActivity;
+import com.example.administrator.guidersystem.minePage.MineActivity;
+import com.example.administrator.guidersystem.navigationPage.MainActivity;
+
 public class NavigatorLayout extends RelativeLayout implements View.OnClickListener{
     private TextView txt_topbar;
     private TextView txt_homePage;
@@ -34,10 +39,6 @@ public class NavigatorLayout extends RelativeLayout implements View.OnClickListe
         else if (getContext().getClass().getSimpleName().equals("MineActivity")){
             txt_mine.setSelected(true);
             txt_topbar.setText(R.string.tab_menu_mine);
-        }
-        else if (getContext().getClass().getSimpleName().equals("SearchResultActivity")){
-            txt_navigator.setSelected(true);
-            txt_topbar.setText(R.string.introduction);
         }
     }
     private void bindViews() {

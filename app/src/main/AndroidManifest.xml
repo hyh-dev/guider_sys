@@ -11,12 +11,14 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_GPS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
         android:allowBackup="true"
@@ -25,16 +27,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:icon">
+        tools:replace="android:icon"
+        android:name="android.support.multidex.MultiDexApplication">>
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="TOzzxnd3taQpauaY50upWbbMpVhor4a5" />
 
-        <activity android:name=".HomeActivity" />
-        <activity android:name=".SearchResultActivity" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".DiscoveryActivity" />
-        <activity android:name=".MineActivity" />
+        <activity android:name=".homePage.HomeActivity" />
+        <activity android:name=".navigationPage.SearchResultActivity" />
+        <activity android:name=".navigationPage.MainActivity" />
+        <activity android:name=".discoveryPage.DiscoveryActivity" />
+        <activity android:name=".minePage.MineActivity" />
         <activity android:name=".BaseActivity" />
         <activity android:name=".LaunchActivity">
             <intent-filter>
@@ -43,12 +46,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LocationActivity" />
+        <activity android:name=".homePage.LocationActivity" />
 
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
-            android:process=":remote"></service>
+            android:process=":remote" />
+
+        <activity android:name=".homePage.IntrouductionActivity" />
+        <activity android:name=".homePage.TransportationActivity" />
+        <activity android:name=".homePage.PhoneActivity" />
+        <activity android:name=".homePage.NoticeActivity" />
+        <activity android:name=".discoveryPage.DiscoveryContentActivity"></activity>
     </application>
 
 </manifest>
