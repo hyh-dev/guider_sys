@@ -21,14 +21,15 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
+        android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@mipmap/mylauncher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:icon"
-        android:name="android.support.multidex.MultiDexApplication">>
+        tools:replace="android:icon">
+        >
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="TOzzxnd3taQpauaY50upWbbMpVhor4a5" />
@@ -57,7 +58,17 @@
         <activity android:name=".homePage.TransportationActivity" />
         <activity android:name=".homePage.PhoneActivity" />
         <activity android:name=".homePage.NoticeActivity" />
-        <activity android:name=".discoveryPage.DiscoveryContentActivity"></activity>
+        <activity android:name=".discoveryPage.DiscoveryContentActivity" />
+        <activity android:name=".navigationPage.RecognizeResultActivity"></activity>
+        <provider
+            android:authorities="com.example.administrator.guidersystem.fileprovider"
+            android:name="android.support.v4.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
     </application>
 
 </manifest>

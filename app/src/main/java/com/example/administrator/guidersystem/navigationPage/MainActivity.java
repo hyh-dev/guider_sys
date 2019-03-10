@@ -4,9 +4,13 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,13 +21,23 @@ import android.widget.Toast;
 
 import com.example.administrator.guidersystem.BaseActivity;
 import com.example.administrator.guidersystem.R;
+import com.example.administrator.guidersystem.homePage.LocationActivity;
 import com.google.zxing.client.android.CaptureActivity;
+
+import org.apache.log4j.chainsaw.Main;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Button scan;
     private Button searchByNumber;
+    private Button recognize;
     private DatabaseManager manager;
     private MyDatabaseHelper dbHelper;
+    private Uri imageUri;
     //数字搜索对话框内部类
     public class Dialog extends AlertDialog{
         private Button confirm;
@@ -64,17 +78,27 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         scan=(Button)findViewById(R.id.scan_QRcode);
         searchByNumber=(Button)findViewById(R.id.searchByNumber);
         searchByNumber.setOnClickListener(this);
+        recognize=(Button)findViewById(R.id.recognize);
         dbHelper=new MyDatabaseHelper(this,"PlantContent.db",null,1);
         dbHelper.getWritableDatabase();//创建数据库
         manager=new DatabaseManager(dbHelper);
         manager.insertDB();//添加数据到数据库
         //动态权限申请
+        List<String> permissionList = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(MainActivity.this,Manifest.permission.CAMERA)!=
                 PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.CAMERA},1);
+            permissionList.add(Manifest.permission.CAMERA);
         }
-        else {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (!permissionList.isEmpty()) {
+            String[] permissions = permissionList.toArray(new String[permissionList.size()]);
+            ActivityCompat.requestPermissions(MainActivity.this, permissions, 1);
+        } else {
             scan.setOnClickListener(this);
+            recognize.setOnClickListener(this);
         }
     }
     //动态权限响应
@@ -82,12 +106,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
             case 1:
-                if (grantResults.length>0&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                if (grantResults.length > 0) {
+                    for (int result : grantResults) {
+                        if (result != PackageManager.PERMISSION_GRANTED) {
+                            Toast.makeText(this, "拒绝权限将无法使用程序", Toast.LENGTH_SHORT).show();
+                            finish();
+                            return;
+                        }
+                    }
                     scan.setOnClickListener(this);
-                }
-                else {
-                    Toast.makeText(this,"拒绝权限将无法使用程序",Toast.LENGTH_SHORT).show();
-                }
+                    recognize.setOnClickListener(this);
+                } else {
+                        Toast.makeText(this, "发生未知错误", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
                 break;
             default:
                 break;
@@ -106,6 +138,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 v= View.inflate(this, R.layout.alert_dialog, null);
                 dialog.setView(v);
                 dialog.show();
+                break;
+            case R.id.recognize:
+                File outputImage = new File(getExternalCacheDir(), "output_image.jpg");
+                try {
+                    if (outputImage.exists()) {
+                        outputImage.delete();
+                    }
+                    outputImage.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (Build.VERSION.SDK_INT >= 24) {
+                    imageUri = FileProvider.getUriForFile(MainActivity.this, "com.example.administrator.guidersystem.fileprovider",
+                            outputImage);
+                } else {
+                    imageUri = Uri.fromFile(outputImage);
+                }
+                Intent intent1 = new Intent("android.media.action.IMAGE_CAPTURE");
+                intent1.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(intent1, 2);
                 break;
                 default:
                     break;
@@ -141,6 +193,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     String returnData = data.getStringExtra("data");
                     query(returnData);
                 }
+                break;
+            case 2:
+                Intent intent=new Intent(MainActivity.this,RecognizeResultActivity.class);
+                intent.putExtra("image","/sdcard/Android/data/com.example.administrator.guidersystem/cache/output_image.jpg");
+                startActivity(intent);
                 break;
                 default:
                     break;

@@ -70,9 +70,11 @@ public class SearchResultActivity extends AppCompatActivity{
                 if (bl==true){
                     mSpeechSynthesizer.speak(introduction);
                     bl=false;
+                    play_pause.setBackgroundResource(R.drawable.time_out);
                 }
                 else{
                     mSpeechSynthesizer.stop();
+                    play_pause.setBackgroundResource(R.drawable.play_circle);
                     bl=true;
                 }
             }

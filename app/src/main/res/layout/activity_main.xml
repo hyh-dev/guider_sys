@@ -30,4 +30,16 @@
         android:drawableLeft="@mipmap/search"
         android:textSize="20dp"
         android:text="数字查询" />
+    <Button
+        android:id="@+id/recognize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/searchByNumber"
+        android:background="@drawable/button_shape"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:drawablePadding="32dp"
+        android:drawableLeft="@mipmap/search"
+        android:textSize="20dp"
+        android:text="植物识别" />
 </RelativeLayout>
