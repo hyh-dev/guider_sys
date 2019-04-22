@@ -4,15 +4,24 @@
     <com.example.administrator.guidersystem.NavigatorLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        >
+    </android.support.v4.view.ViewPager>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/viewPager">
     <GridView
         android:id="@+id/grid_photo"
-        android:layout_marginTop="48dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="3">
+        android:numColumns="5">
     </GridView>
     </LinearLayout>
 </RelativeLayout>

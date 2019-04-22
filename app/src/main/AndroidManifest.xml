@@ -55,7 +55,6 @@
             android:process=":remote" />
 
         <activity android:name=".homePage.IntrouductionActivity" />
-        <activity android:name=".homePage.TransportationActivity" />
         <activity android:name=".homePage.PhoneActivity" />
         <activity android:name=".homePage.NoticeActivity" />
         <activity android:name=".discoveryPage.DiscoveryContentActivity" />

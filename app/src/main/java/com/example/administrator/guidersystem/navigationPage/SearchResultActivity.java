@@ -33,9 +33,9 @@ public class SearchResultActivity extends AppCompatActivity{
     private Handler mHandler;
     private static final int milliseconds = 50;
     //语音合成
-    private String appId = "15678543";
-    private String appKey = "LsCVnK5b9U1ElnAPeec3GTvh";
-    private String appSecret = "mWrGiL3i1VFsIphcd9UkUtZODZQD34wF";
+    private String appId = "16010853";
+    private String appKey = "vsUTHG8IrZ2aWKjSQt5P43oX";
+    private String appSecret = "AkyUpFld6RK9nsShnrStEE3qRnerBWAi";
     private SpeechSynthesizer mSpeechSynthesizer = SpeechSynthesizer.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +62,7 @@ public class SearchResultActivity extends AppCompatActivity{
         mSpeechSynthesizer.setAppId(appId);
         mSpeechSynthesizer.setApiKey(appKey, appSecret);
         mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_SPEAKER, "0"); // 设置发声的人声音，在线生效
-        mSpeechSynthesizer.initTts(TtsMode.MIX); // 初始化离在线混合模式，如果只需要在线合成功能，使用 TtsMode.ONLINEspeechSynthesizer.synthesize("百度一下");
+        mSpeechSynthesizer.initTts(TtsMode.ONLINE); // 初始化离在线混合模式，如果只需要在线合成功能，使用 TtsMode.ONLINEspeechSynthesizer.synthesize("百度一下");
 
         play_pause.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,7 +84,7 @@ public class SearchResultActivity extends AppCompatActivity{
         mSpeechSynthesizer.setSpeechSynthesizerListener(new SpeechSynthesizerListener() {
             @Override
             public void onSynthesizeStart(String s) {
-
+                Log.d("SearchResultActivity","合成开始");
             }
 
             @Override
@@ -93,11 +93,12 @@ public class SearchResultActivity extends AppCompatActivity{
 
             @Override
             public void onSynthesizeFinish(String s) {
-
+                Log.d("SearchResultActivity","合成结束");
             }
 
             @Override
             public void onSpeechStart(String s) {
+                Log.d("SearchResultActivity","播放开始");
             }
 
             @Override
@@ -106,10 +107,12 @@ public class SearchResultActivity extends AppCompatActivity{
 
             @Override
             public void onSpeechFinish(String s) {
+                Log.d("SearchResultActivity","播放结束");
             }
 
             @Override
             public void onError(String s, SpeechError speechError) {
+                Log.d("SearchResultActivity","错误:"+s+speechError);
             }
         });
 

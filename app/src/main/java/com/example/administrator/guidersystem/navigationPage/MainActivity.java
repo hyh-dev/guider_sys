@@ -36,7 +36,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Button searchByNumber;
     private Button recognize;
     private DatabaseManager manager;
-    private MyDatabaseHelper dbHelper;
+    public static MyDatabaseHelper dbHelper;
     private Uri imageUri;
     //数字搜索对话框内部类
     public class Dialog extends AlertDialog{
@@ -79,7 +79,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         searchByNumber=(Button)findViewById(R.id.searchByNumber);
         searchByNumber.setOnClickListener(this);
         recognize=(Button)findViewById(R.id.recognize);
-        dbHelper=new MyDatabaseHelper(this,"PlantContent.db",null,1);
+        dbHelper=new MyDatabaseHelper(this,"PlantContent.db",null,2);
         dbHelper.getWritableDatabase();//创建数据库
         manager=new DatabaseManager(dbHelper);
         manager.insertDB();//添加数据到数据库
@@ -129,16 +129,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+            //二维码扫描
             case R.id.scan_QRcode:
                 Intent intent=new Intent(MainActivity.this,CaptureActivity.class);
                 startActivityForResult(intent, 1);
                 break;
+             //数字查询
             case R.id.searchByNumber:
                 Dialog dialog=new Dialog(MainActivity.this);
                 v= View.inflate(this, R.layout.alert_dialog, null);
                 dialog.setView(v);
                 dialog.show();
                 break;
+             //植物识别
             case R.id.recognize:
                 File outputImage = new File(getExternalCacheDir(), "output_image.jpg");
                 try {

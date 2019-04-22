@@ -13,6 +13,12 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             "music_num text,"+
             "name text,"+
             "introduction text)";
+    private static final String CREATE_PLANT_ONLINE="create table plantOnline(" +
+            "id integer primary key autoincrement," +
+            "name text,"+
+            "imageID text,"+
+            "area text,"+
+            "engName text)";
     public MyDatabaseHelper( Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         mContext=context;
@@ -21,9 +27,13 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_PLANT);
+        db.execSQL(CREATE_PLANT_ONLINE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("drop table if exists plant");
+        db.execSQL("drop table if exists plantOnline");
+        onCreate(db);
     }
 }
