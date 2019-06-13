@@ -13,14 +13,11 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.administrator.guidersystem.BaseActivity;
 import com.example.administrator.guidersystem.R;
-import com.example.administrator.guidersystem.navigationPage.MainActivity;
-import com.example.administrator.guidersystem.navigationPage.MyDatabaseHelper;
+import com.example.administrator.guidersystem.homePage.HomeActivity;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -65,7 +62,7 @@ public class DiscoveryActivity extends BaseActivity {
             Toast.makeText(this,"网络连接不可用",Toast.LENGTH_SHORT).show();
         }
         //获取数据库实例
-        db=MainActivity.dbHelper.getWritableDatabase();
+        db=HomeActivity.dbHelper.getWritableDatabase();
         Log.d("DiscoveryActivity",""+db.query("plantOnline",null,null,null,
                 null,null,null).getCount());
        //数据数量

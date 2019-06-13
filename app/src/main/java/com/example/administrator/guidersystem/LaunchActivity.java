@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.widget.ImageView;
 
 import com.example.administrator.guidersystem.homePage.HomeActivity;
-import com.example.administrator.guidersystem.navigationPage.MainActivity;
 
 public class LaunchActivity extends AppCompatActivity {
     private ImageView imageView;
@@ -27,7 +26,7 @@ public class LaunchActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-               startActivity(new Intent(LaunchActivity.this, MainActivity.class));
+               startActivity(new Intent(LaunchActivity.this, HomeActivity.class));
                 anim.stop();//停止播放动画
                 LaunchActivity.this.finish();
             }

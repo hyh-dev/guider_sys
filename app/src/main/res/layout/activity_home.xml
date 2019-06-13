@@ -1,22 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
+
     <com.example.administrator.guidersystem.NavigatorLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginTop="48dp"
         >
     </android.support.v4.view.ViewPager>
+
+    <!-- 点点 -->
     <LinearLayout
+        android:id="@+id/viewGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/viewPager">
+        android:layout_alignBottom="@id/viewPager"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+    </LinearLayout>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/grid_view"
+        android:layout_below="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <GridView
         android:id="@+id/grid_photo"
         android:layout_width="match_parent"
@@ -24,4 +40,40 @@
         android:numColumns="5">
     </GridView>
     </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/recommendation"
+        android:layout_below="@id/grid_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginTop="15dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            <TextView
+                android:id="@+id/recommend_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/recommend"/>
+            <ImageView
+                android:id="@+id/recommend_picture"
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"/>
+            <TextView
+                android:id="@+id/recommend_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="5dp"
+                android:textSize="18dp"
+                android:textColor="@color/bg_black"/>
+            </LinearLayout>
+    </android.support.v7.widget.CardView>
 </RelativeLayout>

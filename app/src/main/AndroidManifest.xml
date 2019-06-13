@@ -35,8 +35,7 @@
             android:value="TOzzxnd3taQpauaY50upWbbMpVhor4a5" />
 
         <activity android:name=".homePage.HomeActivity" />
-        <activity android:name=".navigationPage.SearchResultActivity" />
-        <activity android:name=".navigationPage.MainActivity" />
+        <activity android:name=".plantDB.SearchResultActivity" />
         <activity android:name=".discoveryPage.DiscoveryActivity" />
         <activity android:name=".minePage.MineActivity" />
         <activity android:name=".BaseActivity" />
@@ -55,19 +54,20 @@
             android:process=":remote" />
 
         <activity android:name=".homePage.IntrouductionActivity" />
-        <activity android:name=".homePage.PhoneActivity" />
-        <activity android:name=".homePage.NoticeActivity" />
         <activity android:name=".discoveryPage.DiscoveryContentActivity" />
-        <activity android:name=".navigationPage.RecognizeResultActivity"></activity>
+        <activity android:name=".plantDB.RecognizeResultActivity" />
+
         <provider
-            android:authorities="com.example.administrator.guidersystem.fileprovider"
             android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.example.administrator.guidersystem.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+                android:resource="@xml/file_paths" />
         </provider>
+
+        <activity android:name=".homePage.QRcodeResult"></activity>
     </application>
 
 </manifest>
